@@ -80,7 +80,7 @@ export default class LoginScreen extends React.Component {
                             }}></TextInput>
 
                             <Button title = "Submit" style = {{backgroundColor: "green"}} 
-                            onPress = {() => {this.signUp(this.state.regEmail, this.state.regPassword)}}></Button>
+                            onPress = {() => {this.signUp(this.state.regEmail, this.state.regPassword, this.state.confirmPassword)}}></Button>
 
                         </KeyboardAvoidingView>
                     </ScrollView>
@@ -96,25 +96,39 @@ export default class LoginScreen extends React.Component {
             var errorMessage = error.message;
             alert(errorCode)
           });
+
+        this.props.navigation.navigate("Donate")
     }
 
-    signUp = async (email, logPassword)=> {
-
-        if (regPassword == confirmPassword) {
-            firebase.auth().createUserWithEmailAndPassword(email, logPassword).catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                alert(errorCode + " " + errorMessage)
-            });
-            alert("User Added")
+    signUp = (emailId, password,confirmPassword) =>{
+        if(password !== confirmPassword){
+            return alert("password doesn't match\nCheck your password.")
+        }else{
+          firebase.auth().createUserWithEmailAndPassword(emailId, password)
+          .then(()=>{
+            db.collection('Users').add({
+              firstName:this.state.firstName,
+              lastName:this.state.lastName,
+              contact:this.state.mobile,
+              emailID:emailId,
+              address:this.state.address
+            })
+            return alert(
+                 'User Added Successfully',
+                 '',
+                 [
+                   {text: 'OK', onPress: () => this.setState({"isModalVisible" : false})},
+                 ]
+             );
+          })
+          .catch((error)=> {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            return alert(errorMessage)
+          });
         }
-
-        else {
-            alert("Passwords do not match")
-        }
-        
-    }
+      }
 
     changeModalVisibility(arg) {
         if (arg) {
@@ -131,32 +145,47 @@ export default class LoginScreen extends React.Component {
     render() {
         return(
             <View>
-
-                {this.showModal}
-
-                <Text style = {{alignSelf:"center", fontSize:20, fontFamily:"comic sans", backgroundColor:"cyan"}}>BOOK SANTA APP!</Text>
-                
-
-                <TextInput style  = {{borderRadius: 5, borderwidth:3, width:200, height:50, marginTop: 50}} 
-                placeholder = "Email" keyboardType = "email-address" onChangeText = {(text)=>{this.setState({email:text,})}}></TextInput>
-
-                <TextInput style  = {{borderRadius: 5, borderwidth:3, width:200, height:50, marginTop: 10}} placeholder = "Password" 
-                keyboardType = "default" secureTextEntry = {true} onChangeText = {(text)=>{this.setState({logPassword:text,})
-                }}></TextInput>
-
-                <TouchableOpacity style = {{borderRadius: 10, width: 200, height: 70, marginTop:20, borderWidth:10}} 
-                onPress = {()=>{this.login(this.state.email, this.state.logPassword)}}><Text style = {{fontSize: 40, paddingLeft:30, 
-                backgroundColor: "green"}}>LOGIN</Text></TouchableOpacity>
-
-                <TouchableOpacity style = {{borderRadius: 10, width: 200, height: 70, marginTop:20, borderWidth:10}} 
-                onPress = {()=>{this.changeModalVisibility(true)}}><Text style = {{fontSize: 35, paddingLeft:30, 
-                backgroundColor: "green"}}>SIGN UP</Text></TouchableOpacity>
-
-
-                <TouchableOpacity style = {{borderRadius: 10, width: 200, height: 70, marginTop:40, borderWidth:10}} 
-                onPress = {()=>{this.setState({isModalVisible: "false",})}}
-                ><Text style = {{fontSize: 40, paddingLeft: 45}}>Back</Text></TouchableOpacity>
+            <View style={{justifyContent: 'center',alignItems: 'center'}}>
+    
             </View>
+              {
+                this.showModal()
+              }
+            <View style={{justifyContent:'center', alignItems:'center'}}>
+             
+              <Text style={styles.title}>Returning user? Log in here.</Text>
+            </View>
+            <View>
+                <TextInput
+                style={styles.loginBox}
+                placeholder="abc@example.com"
+                keyboardType ='email-address'
+                onChangeText={(text)=>{
+                  this.setState({
+                    emailId: text
+                  })
+                }}
+              />
+              <TextInput
+              style={styles.loginBox}
+              secureTextEntry = {true}
+              placeholder="enter Password"
+              onChangeText={(text)=>{
+                this.setState({
+                  password: text
+                })
+              }}
+            />
+            <TouchableOpacity
+               style={[styles.button,{marginBottom:20, marginTop:20}]}
+               onPress = {()=>{
+                 this.login(this.state.emailId, this.state.password)
+               }}
+               >
+               <Text style={styles.buttonText}>Login</Text>
+             </TouchableOpacity>
+          </View>
+        </View>
         )
     }
 }
