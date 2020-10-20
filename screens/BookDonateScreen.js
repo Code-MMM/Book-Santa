@@ -48,8 +48,10 @@ export default class BookDonateScreen extends Component{
   keyExtractor = (item, index) => index.toString()
   renderItem = ({item, i}) => {
     return(
-      <ListItem key = {i} title = {item.BookName} subtitle = {item.reason} titleStyle = {{color:"black", fontWeight: "bold"}} rightElement = {
-        <TouchableOpacity style = {styles.button}><Text>View Content</Text></TouchableOpacity>
+      <ListItem key = {i} title = {item.BookName} subtitle = {item.Reason} titleStyle = {{color:"black", fontWeight: "bold"}} rightElement = {
+        <TouchableOpacity style = {styles.button} onPress = {()=>{this.props.navigation.navigate(
+          "RecieverDetails", {'details':item}
+        )}}><Text>View Content</Text></TouchableOpacity>
       } bottomDivider></ListItem>
     )
   }
