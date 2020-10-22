@@ -17,7 +17,7 @@ import firebase from 'firebase';
 
 
 
-export default class BookDonateScreen extends Component{
+export default class BookDonateScreen extends React.Component{
 
   constructor() {
     super();
@@ -36,6 +36,11 @@ export default class BookDonateScreen extends Component{
     this.requestRef()
   }
 
+  goToDetails = (item) => {
+    this.props.navigation.navigate("RecieverDetails", {'details':item})
+    console.log("i should navigate.")
+  }
+
   updateRequestList = () => {
     this.requestRef = db.collection('Requests').onSnapshot((snapshot)=>{
       var requestBookList = snapshot.docs.map(doccument => doccument.data());
@@ -49,9 +54,7 @@ export default class BookDonateScreen extends Component{
   renderItem = ({item, i}) => {
     return(
       <ListItem key = {i} title = {item.BookName} subtitle = {item.Reason} titleStyle = {{color:"black", fontWeight: "bold"}} rightElement = {
-        <TouchableOpacity style = {styles.button} onPress = {()=>{this.props.navigation.navigate(
-          "RecieverDetails", {'details':item}
-        )}}><Text>View Content</Text></TouchableOpacity>
+        <TouchableOpacity style = {styles.button} onPress = {()=>{this.goToDetails(item)}}><Text>View Content</Text></TouchableOpacity>
       } bottomDivider></ListItem>
     )
   }
@@ -71,6 +74,7 @@ export default class BookDonateScreen extends Component{
     );
  }
 }
+
 
 var styles = StyleSheet.create({
   KeyboardStyle: {

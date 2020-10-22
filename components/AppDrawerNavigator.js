@@ -18,10 +18,12 @@ import {createDrawerNavigator} from 'react-navigation-drawer'
 import {AppTabNavigator} from './AppTabNavigator'
 import {SideBar} from './SideBarMenu'
 import SettingsScreen from '../screens/Settings'
+import MyDonations from '../screens/myDonations'
 
 export const AppDrawerNavigator = createDrawerNavigator({
     Home:{screen:AppTabNavigator},
-    Settings:{screen:SettingsScreen}
+    Settings:{screen:SettingsScreen},
+    Donations: {screen:MyDonations},
 },
     {contentComponent:SideBar},
     {initialRootName:"Home"

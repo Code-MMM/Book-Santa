@@ -69,7 +69,7 @@ export default class RecieverScreen extends React.Component {
                     <Card><Text style = {{fontWeight:"bold"}}>Reciever's Address:{this.state.recieverAdress}</Text></Card>
                 </Card>
 
-            <View style = {styles.subContainer}>
+            <View>
                 {this.state.recieverID!=this.state.userID?(
                     <TouchableOpacity style = {styles.button} onPress = {()=>{this.updateBookStatus(); this.props.navigation.navigate('MyDonations')}}
                     ><Text>Donate</Text></TouchableOpacity>
