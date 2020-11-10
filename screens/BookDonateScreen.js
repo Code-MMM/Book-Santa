@@ -37,8 +37,8 @@ export default class BookDonateScreen extends React.Component{
   }
 
   goToDetails = (item) => {
-    this.props.navigation.navigate("RecieverDetails", {'details':item})
     console.log("i should navigate.")
+    this.props.navigation.navigate("RecieverDetails", {'details': item})
   }
 
   updateRequestList = () => {

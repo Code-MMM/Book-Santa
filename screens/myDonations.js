@@ -1,67 +1,140 @@
-import React,{Component}from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    Modal,
-    KeyboardAvoidingView,
-    StyleSheet,
-    TouchableOpacity,
-    Alert,
-    FlatList,
-    ScrollView} from 'react-native';
-import {ListItem, Card, Icon} from 'react-native-elements'
-import MyHeader from '../components/MyHeader'
-import db from '../config';
+import React ,{Component} from 'react'
+import {View, Text,TouchableOpacity,ScrollView,FlatList,StyleSheet} from 'react-native';
+import {Card,Icon,ListItem} from 'react-native-elements'
+import MyHeader from '../components/MyHeader.js'
 import firebase from 'firebase';
+import db from '../config.js'
 
-export default class MyDonations extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            userID: firebase.auth().currentUser.email,
-            allDonations:[],
+export default class MyDonations extends Component {
+  static navigationOptions = { header: null };
+
+   constructor(){
+     super()
+     this.state = {
+       userId : firebase.auth().currentUser.email,
+       allDonations : [],
+       donorName: "",
+     }
+     this.requestRef= null
+   }
+
+
+   getAllDonations =()=>{
+     this.requestRef = db.collection("Donations").where("DonorID" ,'==', this.state.userId)
+     .onSnapshot((snapshot)=>{
+       var allDonations = snapshot.docs.map(document => document.data());
+       this.setState({
+         allDonations : allDonations,
+       });
+     })
+   }
+
+   sendNotification = (bookDetails, requestStatus)=> {
+    var requestID = bookDetails.requestID
+    var donorId = bookDetails.donorId
+    db.collection('Notifications').where(requestID, "==", "requestID").where(donorId, "==", "donorID").get().then((snapshot)=>{
+      snapshot.forEach((doc)=>{
+        var message = ''; 
+        if (requestStatus == "bookSent") {
+          message = this.state.donorName + " has sent the book.";
         }
-        this.requestRef = null;
-    }
 
-    keyExtractor = (item, index) => index.toString()
-    renderItem = ({item, i}) => {
-      return(
-        <ListItem key = {i} title = {item.BookName} subtitle = {"Requested by: " + item.RecieverName + "\nStatus: " + item.RequestStatus} titleStyle = 
-        {{color:"black", fontWeight: "bold"}} leftElement = {<Icon name = "Book" type = "font-awesome" color = "blue"></Icon>} rightElement = {
-          <TouchableOpacity style = {styles.button} onPress = {()=>{this.props.navigation.navigate(
-            "RecieverDetails", {'details':item}
-          )}}><Text>View Content</Text></TouchableOpacity>
-        } bottomDivider></ListItem>
-      )
-    }
+        else {
+          message = this.state.donorName + " has shown interest in donating.";
+        }
 
-    getAllDonations = () => {
-        this.requestRef = db.collection('Donations').where("DonorID", "==", this.state.userID).onSnapshot((snapshot)=>{
-            var allDonations = snapshot.docs.map(document=>document.data())
-            this.setState({
-                allDonations:allDonations
-            })
+        db.collection('Notifications').doc().update({
+          "message":message,
+          "notificationStatus": "unread",
+          "date": firebase.firestore.FieldValue.serverTimestamp(),
         })
+      })
+    })
+   }
+
+   sendBook = (bookDetails) => {
+    if (bookDetails.requestStatus == 'bookSent') {
+      var requestStatus = "donorInterested";
+      db.collection('Donations').doc(bookDetails.doc.id).update({
+        "requestStatus": requestStatus,
+      })
+
+      this.sendNotification(bookDetails, requestStatus);
     }
+   }
 
-    componentDidMount() {
-        this.getAllDonations()
-    }
+   keyExtractor = (item, index) => index.toString()
 
-    render() {
-        return(
-            <View style = {{flex:1}}>
-                <MyHeader navigation = {this.props.navigation} title = "My Donations"></MyHeader>
+   renderItem = ( {item, i} ) =>(
+     <ListItem
+       key={i}
+       title={item.book_name}
+       subtitle={"Requested By : " + item.RecieverName +"\nStatus : " + item.RequestStatus}
+       leftElement={<Icon name="book" type="font-awesome" color ='#696969'/>}
+       titleStyle={{ color: 'black', fontWeight: 'bold' }}
+       rightElement={
+           <TouchableOpacity style={styles.button} onPress = {()=>{this.sendBook(item)}}>
+             <Text style={{color:'#ffff'}}>Send Book</Text>
+           </TouchableOpacity>
+         }
+       bottomDivider
+     />
+   )
 
-                <View style = {{flex:1}}>
-                    {this.state.allDonations.length===0?(<Text>You dont have any outgoing donations.</Text>):(<FlatList keyExtractor = {this.keyExtractor}
-                        data = {this.allDonations} renderItem = {this.renderItem}
-                    ></FlatList>)}
-                </View>
 
-            </View>
-        )
-    }
-}
+   componentDidMount(){
+     this.getAllDonations()
+   }
+
+   componentWillUnmount(){
+     this.requestRef();
+   }
+
+   render(){
+     return(
+       <View style={{flex:1}}>
+         <MyHeader navigation={this.props.navigation} title="My Donations"/>
+         <View style={{flex:1}}>
+           {
+             this.state.allDonations.length === 0
+             ?(
+               <View style={styles.subtitle}>
+                 <Text style={{ fontSize: 20}}>List of all book Donations</Text>
+               </View>
+             )
+             :(
+               <FlatList
+                 keyExtractor={this.keyExtractor}
+                 data={this.state.allDonations}
+                 renderItem={this.renderItem}
+               />
+             )
+           }
+         </View>
+       </View>
+     )
+   }
+   }
+
+
+const styles = StyleSheet.create({
+  button:{
+    width:100,
+    height:30,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:"#ff5722",
+    shadowColor: "#000",
+    shadowOffset: {
+       width: 0,
+       height: 8
+     },
+    elevation : 16
+  },
+  subtitle :{
+    flex:1,
+    fontSize: 20,
+    justifyContent:'center',
+    alignItems:'center'
+  }
+})

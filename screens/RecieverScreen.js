@@ -23,7 +23,7 @@ export default class RecieverScreen extends React.Component {
             recieverID: this.props.navigation.getParam('details')['UserID'],
             requestID: this.props.navigation.getParam('details')['RequestID'],
             bookName: this.props.navigation.getParam('details')['BookName'],
-            reason: this.props.navigation.getParam('details')['reason'],
+            reason: this.props.navigation.getParam('details')['Reason'],
             recieverName: '',
             recieverContact:'',
             recieverAdress:'',
@@ -57,6 +57,28 @@ export default class RecieverScreen extends React.Component {
             DonorID:this.state.userID,
             RequestStatus: "Donor Interested",
         })
+
+        this.getNotification();
+    }
+
+    componentDidMount() {
+        this.getRecieverDetails();
+        this.getUser
+    }
+
+    getNotification = () => {
+        var message = "User " + this.state.recieverName + " wants to donate";
+        db.collection('Notifications').add({
+            "recieverID":this.state.recieverID,
+            "donorID": this.state.userID,
+            "requestID": this.state.requestID,
+            "bookName": this.state.bookName,
+            "date": firebase.firestore.FieldValue.serverTimestamp(),
+            "notificationstatus":"unread",
+            "message":message,
+        })
+
+        this.props.navigation.navigate('MyDonations')
     }
 
     render() {

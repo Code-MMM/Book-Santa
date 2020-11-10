@@ -25,10 +25,12 @@ export default class BookRequestScreen extends Component{
 
 
   publishRequest = () => {
+    var randomRequestId = Math.random().toString(36).substring(7);
     db.collection("Requests").add({
       UserID: this.state.UserID,
       BookName: this.state.BookName,
       Reason: this.state.Reason,
+      RequestID: randomRequestId,
     })
 
     this.setState({
