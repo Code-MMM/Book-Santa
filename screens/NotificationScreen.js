@@ -14,10 +14,11 @@ import {ListItem, Card} from 'react-native-elements'
 import MyHeader from '../components/MyHeader'
 import db from '../config';
 import firebase from 'firebase';
+import {SwipeableFlatlist} from '../components/swipeablleFlatlist';
 
 export default class NotificationScreen extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             userID:firebase.auth().currentUser.email,
             notifications:[],
@@ -34,7 +35,7 @@ export default class NotificationScreen extends React.Component {
                 var allNotifications = [];
                 snapshot.docs.map((doc)=>{
                     var notification = doc.data();
-                    // notification["doc.id"] == doc.id;
+                    notification["doc_id"] = doc.id;
                     allNotifications.push(notification);
                 })
 
@@ -74,7 +75,7 @@ export default class NotificationScreen extends React.Component {
                     {this.state.notifications.length == 0?(<View style = {{flex:1, justifyContent:'center', alignItems: 'center'}}>
                         <Text>Sadly, you dont have any notifications 😢</Text>
                     </View>):(
-                        <FlatList keyExtractor = {this.keyExtractor} data = {this.state.notifications} renderItem = {this.renderItem}></FlatList>
+                        <SwipeableFlatlist allNotifications = {this.state.allNotifications}></SwipeableFlatlist>
                     )}
                 </View>
             </View>
