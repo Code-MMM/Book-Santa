@@ -10,6 +10,7 @@ import {
 import db from '../config'
 import firebase from 'firebase'
 import MyHeader from '../components/MyHeader'
+import { Updates } from 'expo';
 
 
 export default class BookRequestScreen extends Component{
@@ -20,11 +21,14 @@ export default class BookRequestScreen extends Component{
       UserID: firebase.auth().currentUser.email,
       BookName:"",
       Reason:"",
+      RequestID:"",
+      RequestedBookName:"",
+      bookStatus:"",
+      DocID:"",
     }
   }
 
-
-  publishRequest = () => {
+  publishRequest = async () => {
     var randomRequestId = Math.random().toString(36).substring(7);
     db.collection("Requests").add({
       UserID: this.state.UserID,
@@ -32,6 +36,15 @@ export default class BookRequestScreen extends Component{
       Reason: this.state.Reason,
       RequestID: randomRequestId,
     })
+    
+    await this.getBookRequest()
+    db.collection('Users').where("emailID", "==", this.state.UserID).get().then()
+    .then((snapshot)=>{
+      snapshot.forEach((doc)=>{db.collection('Users').doc(doc.id).update({
+        bookRequestActive: true,
+      })})
+    })
+  
 
     this.setState({
       BookName:"",
@@ -40,10 +53,47 @@ export default class BookRequestScreen extends Component{
 
     alert("Your Request Is Now Available To The Public.")
   }
-  
+
+  getBookRequest = () =>{
+    var bookRequest = db.collection('requested_books').where("user_id", "==", this.state.UserID).get().then(
+      (snapshot)=>{
+        snapshot.forEach((doc)=>{if(doc.data().bookStatus!="recieved") {
+          this.setState({
+            RequestID:doc.data().request_id,
+            RequestedBookName:doc.data().book_name,
+            bookStatus: doc.data().book_status,
+            DocID:doc.id,
+          })
+        }})
+      }
+    )
+  }
+
+  getBookRequestActive() {
+    db.collection('Users').where("email_id", "==", this.state.UserID).onSnapshot(querySnapshot=>{
+      querySnapshot.forEach((doc)=>{this.setState({
+        bookRequestActive: doc.data().bookRequestActive,
+        UserDocID: doc.id,
+      })})
+    })
+  }
+
+
  
   render(){
-    return(
+    if (this.state.bookRequestActive) {
+      return(
+        <View style = {{flex:1, justifyContent: 'center'}}>
+          <Text>Book Name</Text>
+      <Text>{this.state.RequestedBookName}</Text>
+      <Text>Book Status</Text>
+      <Text>{this.state.bookStatus}</Text>
+        </View>
+      )
+    }
+
+    else  {
+      return(
       <View style = {{flex:1}}>
 
         <MyHeader title = "Request Books"></MyHeader>
@@ -65,6 +115,8 @@ export default class BookRequestScreen extends Component{
 
       </View>
     )
+    }
+    
   }
 }
 
