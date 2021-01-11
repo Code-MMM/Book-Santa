@@ -2,16 +2,19 @@ import firebase from 'firebase';
 require('@firebase/firestore')
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBex0g7N1IpVhPN2OjjUJQADJmiQeXvXYQ",
-  authDomain: "book-santa2.firebaseapp.com",
-  databaseURL: "https://book-santa2.firebaseio.com",
-  projectId: "book-santa2",
-  storageBucket: "book-santa2.appspot.com",
-  messagingSenderId: "771903010833",
-  appId: "1:771903010833:web:97494953607423d57359b0"
+  apiKey: "AIzaSyB67AetZ1_e39rKKCAY43TBtgAuHsmy5xE",
+  authDomain: "book-santa-3.firebaseapp.com",
+  projectId: "book-santa-3",
+  storageBucket: "book-santa-3.appspot.com",
+  messagingSenderId: "649567811755",
+  appId: "1:649567811755:web:da6e72f95fe8c8ec0adfee",
+  measurementId: "G-EBJ7GTPFW6"
 };
 
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+
 
 export default firebase.firestore();

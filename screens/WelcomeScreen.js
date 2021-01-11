@@ -10,7 +10,6 @@ import {
     Alert,
     ScrollView} from 'react-native';
 
-
 import db from '../config';
 import firebase from 'firebase';
 
@@ -32,38 +31,34 @@ export default class WelcomeScreen extends Component{
   }
 
   userSignUp = (emailId, password,confirmPassword) =>{
-
-    console.log("user sign up")
-
-    if(password !== confirmPassword){
-      return alert("password doesn't match\nCheck your password.")
-  }else{
-    firebase.auth().createUserWithEmailAndPassword(emailId, password)
-    .then(()=>{
-      db.collection('Users').add({
-        firstName:this.state.firstName,
-        lastName:this.state.lastName,
-        contact:this.state.contact,
-        emailID:emailId,
-        address:this.state.address,
-        bookRequestActive: false,
-      })
-      alert(
-           'User Added Successfully',
-           '',
-           [
-             {text: 'OK', onPress: () => this.setState({"isModalVisible" : false})},
-           ]
-       );
-       this.props.navigation.navigate('DonateBooks')
-    })
-    .catch((error)=> {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      return alert(errorMessage)
-    });
-  }
+   if(password !== confirmPassword){
+       return Alert.alert("password doesn't match\nCheck your password.")
+   }else{
+     firebase.auth().createUserWithEmailAndPassword(emailId, password)
+     .then(()=>{
+       db.collection('users').add({
+         first_name:this.state.firstName,
+         last_name:this.state.lastName,
+         contact:this.state.contact,
+         email_id:this.state.emailId,
+         address:this.state.address,
+         IsBookRequestActive : false
+       })
+       return  Alert.alert(
+            'User Added Successfully',
+            '',
+            [
+              {text: 'OK', onPress: () => this.setState({"isModalVisible" : false})},
+            ]
+        );
+     })
+     .catch((error)=> {
+       // Handle Errors here.
+       var errorCode = error.code;
+       var errorMessage = error.message;
+       return Alert.alert(errorMessage)
+     });
+   }
  }
 
 userLogin = (emailId, password)=>{
@@ -74,7 +69,7 @@ userLogin = (emailId, password)=>{
    .catch((error)=> {
      var errorCode = error.code;
      var errorMessage = error.message;
-     alert(errorMessage)
+     return Alert.alert(errorMessage)
    })
  }
 
@@ -194,7 +189,7 @@ showModal = ()=>{
             this.showModal()
           }
         <View style={{justifyContent:'center', alignItems:'center'}}>
-         
+          { /*<SantaAnimation/>*/}
           <Text style={styles.title}>Book Santa</Text>
         </View>
         <View>

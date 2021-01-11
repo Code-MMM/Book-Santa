@@ -1,33 +1,32 @@
-import React,{Component}from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    Modal,
-    KeyboardAvoidingView,
-    StyleSheet,
-    TouchableOpacity,
-    Alert,
-    FlatList,
-    ScrollView} from 'react-native';
-import {ListItem} from 'react-native-elements'
-import MyHeader from '../components/MyHeader'
-import db from '../config';
-import firebase from 'firebase';
-import {createDrawerNavigator} from 'react-navigation-drawer'
-import {AppTabNavigator} from './AppTabNavigator'
-import {SideBar} from './SideBarMenu'
-import SettingsScreen from '../screens/Settings'
-import MyDonations from '../screens/myDonations'
+import React from 'react';
+import {createDrawerNavigator} from 'react-navigation-drawer';
+import { AppTabNavigator } from './AppTabNavigator'
+import CustomSideBarMenu  from './CustomSideBarMenu';
+import MyDonationScreen from '../screens/MyDonationScreen';
 import NotificationScreen from '../screens/NotificationScreen';
+import SettingScreen from '../screens/SettingScreen';
+import MyReceivedBooksScreen from '../screens/MyReceivedBooksScreen';
 
 export const AppDrawerNavigator = createDrawerNavigator({
-    Home:{screen:AppTabNavigator},
-    Notifications:{screen:NotificationScreen},
-    Settings:{screen:SettingsScreen},
-    Donations: {screen:MyDonations},
-    Notifications:{screen:NotificationScreen},
+  Home : {
+    screen : AppTabNavigator
+    },
+  MyDonations : {
+    screen : MyDonationScreen
+  },
+  Notification : {
+    screen : NotificationScreen
+  },
+  MyReceivedBooks :{
+    screen: MyReceivedBooksScreen
+  },
+  Setting : {
+    screen : SettingScreen
+  }
 },
-    {contentComponent:SideBar},
-    {initialRootName:"Home"
-})
+  {
+    contentComponent:CustomSideBarMenu
+  },
+  {
+    initialRouteName : 'Home'
+  })
